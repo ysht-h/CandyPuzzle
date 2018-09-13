@@ -1,9 +1,11 @@
 ﻿<Properties StartupConfiguration="{18633CA1-A286-B1ED-1AD9-8B511F0EBEFF}|">
   <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="Unity.Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/gameController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/game/gameController.cs">
     <Files>
-      <File FileName="Assets/gameMgr.cs" Line="21" Column="3" />
-      <File FileName="Assets/gameController.cs" Line="15" Column="2" />
+      <File FileName="Assets/game/gameMgr.cs" Line="124" Column="6" />
+      <File FileName="Assets/game/gameController.cs" Line="187" Column="34" />
+      <File FileName="Assets/shareData.cs" Line="11" Column="6" />
+      <File FileName="Assets/title/eventCtl.cs" Line="8" Column="5" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />

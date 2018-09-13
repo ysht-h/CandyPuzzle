@@ -9,7 +9,8 @@ TagManager:
   - candyPerple
   - candyRed
   - candyYellow
-  - candyComb
+  - bomb
+  - block
   layers:
   - Default
   - TransparentFX
