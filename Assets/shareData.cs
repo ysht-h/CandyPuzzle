@@ -9,7 +9,9 @@ public class shareData : MonoBehaviour
     {
         get; private set;
     }
+
     public int scoreNum = 0;
+    public Texture2D gamebg = null;
 
     void Awake()
     {
@@ -21,5 +23,6 @@ public class shareData : MonoBehaviour
         DontDestroyOnLoad (gameObject);
 
         scoreNum = 0;
+        gamebg = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
     }
 }

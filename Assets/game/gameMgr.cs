@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class gameMgr : MonoBehaviour 
 {
@@ -28,7 +29,10 @@ public class gameMgr : MonoBehaviour
     private int feverAnimeCnt = 0;
     private float feverLimitTime = 0.0f;
 
+    private float endtimer = 0.0f;
+
     private shareData sharemgr;
+    private GameObject bgm;
 
 
     // Use this for initialization
@@ -50,74 +54,91 @@ public class gameMgr : MonoBehaviour
 
         sharemgr = shareData.Instance;
         sharemgr.scoreNum = 0;
-    }
-	
-	// Update is called once per frame
-	void Update () 
-    {
-        if(isEnd)
-        {
-            return;
-        }
 
-        if (!isPlay)
+        endtimer = 0.0f;
+
+        bgm = GameObject.Find("bgm");
+    }
+
+    // Update is called once per frame
+    void Update () 
+    {
+        if (isEnd)
         {
-            timertxt.text = countDown.ToString();
-            if (countDown > 0)
+            endtimer += Time.deltaTime;
+            if (endtimer >= 2.0f)
             {
-                counter += Time.deltaTime;
-                if (counter >= 1.0f)
+                score.active = false;
+                StartCoroutine("waitDraw");
+            }
+
+
+        }
+        else
+        {
+            if (!isPlay)
+            {
+                timertxt.text = countDown.ToString();
+                if (countDown > 0)
                 {
-                    counter = 0.0f;
-                    countDown -= 1;
+                    counter += Time.deltaTime;
+                    if (counter >= 1.0f)
+                    {
+                        counter = 0.0f;
+                        countDown -= 1;
+                    }
+                }
+                else
+                {
+                    bgm.GetComponent<AudioSource>().Play();
+
+                    isPlay = true;
+                    timertxt.text = time.ToString("F1");
+                    makeCandy(50, -2.0f);
                 }
             }
             else
             {
-                isPlay = true;
+                scoretxt.text = "score:" + sharemgr.scoreNum.ToString();
+                time -= Time.deltaTime;
                 timertxt.text = time.ToString("F1");
-                makeCandy(50, -2.0f);
-            }
-        }
-        else
-        {
-            scoretxt.text = "score:" + sharemgr.scoreNum.ToString();
-            time -= Time.deltaTime;
-            timertxt.text = time.ToString("F1");
-            if(time <= 0.0f )
-            {
-                isPlay = false;
-                timertxt.text = "Finish!";
-                isEnd = true;
-            }
-
-            // フィーバー関連
-            if(isFever)
-            {
-                // アニメーション
-                feverAnimeCnt++;
-                if (feverAnimeCnt >= 2)
+                if (time <= 0.0f)
                 {
-                    feverAnimeCnt = 0;
-                    gageimg.enabled = (gageimg.enabled) ? false : true;
+                    isPlay = false;
+                    timertxt.text = "Finish!";
+                    isEnd = true;
+
+                    endtimer = 0.0f;
                 }
 
-                // フィーバータイム終了判定
-                feverLimitTime = Time.deltaTime / 10.0f;
-                gageimg.fillAmount -= feverLimitTime;
-
-                if(gageimg.fillAmount <= 0.0f)
+                // フィーバー関連
+                if (isFever)
                 {
-                    gageimg.fillAmount = 0.0f;
-                    feverLimitTime = 0.0f;
-                    feverCnt = 0;
-                    isFever = false;
-                    gageimg.enabled = true;
+                    // アニメーション
+                    feverAnimeCnt++;
+                    if (feverAnimeCnt >= 2)
+                    {
+                        feverAnimeCnt = 0;
+                        gageimg.enabled = (gageimg.enabled) ? false : true;
+                    }
+
+
+                    // フィーバータイム終了判定
+                    feverLimitTime = Time.deltaTime / 10.0f;
+                    gageimg.fillAmount -= feverLimitTime;
+
+                    if (gageimg.fillAmount <= 0.0f)
+                    {
+                        gageimg.fillAmount = 0.0f;
+                        feverLimitTime = 0.0f;
+                        feverCnt = 0;
+                        isFever = false;
+                        gageimg.enabled = true;
+                    }
                 }
+
             }
-
         }
-
     }
 
     public void calFever(int num)
@@ -151,6 +172,9 @@ public class gameMgr : MonoBehaviour
 
     public void resetGame()
     {
+        //GameObject rest = GameObject.Find("buttonse");
+        //rest.GetComponent<AudioSource>().Play();
+
         Application.LoadLevel("gameScene");
     }
 
@@ -228,6 +252,15 @@ public class gameMgr : MonoBehaviour
     private IEnumerator sleep(float wait)
     {
         yield return new WaitForSeconds(wait);
+    }
+
+    private IEnumerator waitDraw()
+    {
+        yield return new WaitForEndOfFrame();
+
+        sharemgr.gamebg.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+        sharemgr.gamebg.Apply();
+        SceneManager.LoadScene("resultscene");
     }
 
 }

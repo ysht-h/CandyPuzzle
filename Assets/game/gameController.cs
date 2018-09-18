@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class gameController : MonoBehaviour 
 {
+    public GameObject effprefabbomb;
+    public GameObject[] effprefabcandy;
 
     private GameObject firstSelObj = null;
     private GameObject lastSelObj = null;
@@ -136,6 +138,7 @@ public class gameController : MonoBehaviour
                 if( culTag == obj.tag)
                 {
                     // 最後に選択したものと別なら
+                    /*
                     if(lastSelObj != obj)
                     {
                         // 一定の距離内なら
@@ -145,9 +148,60 @@ public class gameController : MonoBehaviour
                             addDelList(obj);
                         }
                     }
+                    */
+                    // リストに登録されてなければ
+                    if (!isExistObjAtDelList(obj))
+                    {
+
+                        addDelList(obj);
+                    }
                 }
             }
         }
+    }
+
+    private bool isExistObjAtDelList(GameObject obj)
+    {
+        if (delObjList == null || obj == null)
+        {
+            return false;
+        }
+
+        int delnum = delObjList.Count;
+        float dist = 0.0f;
+        float tmpdist = 0.0f;
+
+        for (int i = 0; i < delnum; i++)
+        {
+            if (delObjList[i].Equals(obj))
+            {
+                return true;
+            }
+            else
+            {
+                // もし比較で違っていたら、距離を算出し、その集合との最短距離をだす
+                if (i == 0)
+                {
+                    dist = Vector2.Distance(delObjList[i].transform.position, obj.transform.position);
+                }
+                else
+                {
+                    tmpdist = Vector2.Distance(delObjList[i].transform.position, obj.transform.position);
+                    if (tmpdist < dist)
+                    {
+                        dist = tmpdist;
+                    }
+                }
+            }
+        }
+
+        // 算出した最短距離が一定の距離内なら
+        if (dist < 1.5f)
+        {
+            return false;
+        }
+
+        return true;
     }
 
     private Collider2D GetHitRay()
@@ -178,6 +232,9 @@ public class gameController : MonoBehaviour
         // ブロックの生成確率
         int makeblocknum = UnityEngine.Random.Range(0, 10);
         int removeblockcnt = 0;
+        int colid = 0;
+        string[] tags = { "candyBlue", "candyOrange", "candyPerple",
+                          "candyRed", "candyYellow", "block"};
 
         for (int i = 0; i < num; i++)
         {
@@ -186,6 +243,22 @@ public class gameController : MonoBehaviour
             {
                 removeblockcnt++;
             }
+
+            GameObject effcandy = null;
+            for (int j = 0; j < 6; j++)
+            {
+                if (delObjList[i].tag.StartsWith(tags[j], System.StringComparison.Ordinal))
+                {
+                    effcandy = Instantiate(effprefabcandy[j]) as GameObject;
+                    break;
+                }
+            }
+
+            //GameObject effcandy = Instantiate(effprefabcandy) as GameObject;
+            Destroy(effcandy, effcandy.GetComponent<ParticleSystem>().main.duration);
+            effcandy.transform.position = delObjList[i].transform.position;
+            effcandy.transform.Rotate(new Vector3(20.0f, 0.0f, 0.0f));
+            effcandy.GetComponent<AudioSource>().Play();
 
             // 飴リストからも削除
             gamemgrComp.delCandyfromList(delObjList[i]);
@@ -250,6 +323,13 @@ public class gameController : MonoBehaviour
             delObjList.Clear();
             delObjList.TrimExcess();
         }
+
+        GameObject effbomb = Instantiate(effprefabbomb) as GameObject;
+        Destroy(effbomb, effbomb.GetComponent<ParticleSystem>().main.duration);
+        effbomb.transform.position = obj.transform.position;
+        effbomb.transform.Rotate(new Vector3(110.0f, 0.0f, 0.0f));
+        effbomb.GetComponent<AudioSource>().Play();
+
         Destroy(obj);
     }
 
